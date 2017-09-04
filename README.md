@@ -1,9 +1,18 @@
-***
 How to build
-***
+---
+
+1. Install cmake 
+
+2. Download "dynamorio" on github
+
+3. Use VS2013 cmd, run following command
+
+
 ```
 mkdir ../build
 cd ../build
-cmake -DDynamoRIO_DIR=$DYNAMORIO_HOME/cmake ../myclient
-make
+<CMAKEPATH> -DDynamoRIO_DIR=<DYNAMORIO_HOME_PATH>/cmake ..
 ```
+
+4. Use Visual Studio Open "ALL BUILD" project
+
