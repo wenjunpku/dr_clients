@@ -1,0 +1,6 @@
+add_library(call_trace SHARED call_trace.c)
+find_package(DynamoRIO)
+if (NOT DynamoRIO_FOUND)
+  message(FATAL_ERROR "DynamoRIO package required to build")
+endif(NOT DynamoRIO_FOUND)
+configure_DynamoRIO_client(call_trace)
