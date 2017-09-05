@@ -1,6 +1,5 @@
 #include<stdio.h>
-#ifndef HANDLE
-#define HANDLE
+
 typedef int(*callmehod)(int);
 static void startFake(){
 	int addr = 0x00401500;
@@ -12,4 +11,3 @@ static void startFake(){
 	printf("Fakecall:%d\n", i);
 	return;
 }
-#endif

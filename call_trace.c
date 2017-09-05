@@ -58,15 +58,7 @@
 # include "drsyms.h"
 #endif
 #include "utils.h"
-
-typedef int(*callmehod)(int);
-static void startFake(){
-	int addr = 0x00401500;
-	callmehod m = (callmehod)addr;
-	int i = m(5);
-	printf("Fakecall:%d\n", i);
-	return;
-}
+#include "handle.c"
 
 static void event_exit(void);
 static void event_thread_init(void *drcontext);
