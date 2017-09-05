@@ -22,4 +22,4 @@ function (add_sample_client name source_file_list extension_list)
 
 endfunction (add_sample_client)
 
-add_sample_client(call_trace       "call_trace.c;utils.c"         "drmgr;drx")
+add_sample_client(call_trace       "call_trace.c;utils.c;handle.c"         "drmgr;drx;drsyms")

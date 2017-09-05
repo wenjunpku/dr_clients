@@ -53,10 +53,20 @@
 
 #include "dr_api.h"
 #include "drmgr.h"
+#define SHOW_SYMBOLS 1
 #ifdef SHOW_SYMBOLS
 # include "drsyms.h"
 #endif
 #include "utils.h"
+
+typedef int(*callmehod)(int);
+static void startFake(){
+	int addr = 0x00401500;
+	callmehod m = (callmehod)addr;
+	int i = m(5);
+	printf("Fakecall:%d\n", i);
+	return;
+}
 
 static void event_exit(void);
 static void event_thread_init(void *drcontext);
@@ -78,6 +88,7 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 	my_id = id;
 	/* make it easy to tell, by looking at log file, which client executed */
 	dr_log(NULL, LOG_ALL, 1, "Client 'instrcalls' initializing\n");
+	printf("client started\n");
 	/* also give notification to stderr */
 #ifdef SHOW_RESULTS
 	if (dr_is_notify_on()) {
@@ -104,6 +115,7 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 static void
 event_exit(void)
 {
+	startFake();
 #ifdef SHOW_SYMBOLS
 	if (drsym_exit() != DRSYM_SUCCESS) {
 		dr_log(NULL, LOG_ALL, 1, "WARNING: error cleaning up symbol library\n");
