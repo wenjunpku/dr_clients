@@ -59,6 +59,7 @@
 #endif
 #include "utils.h"
 #include "handle.c"
+#include "msghandler.h"
 
 static void event_exit(void);
 static void event_thread_init(void *drcontext);
@@ -80,7 +81,8 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 	my_id = id;
 	/* make it easy to tell, by looking at log file, which client executed */
 	dr_log(NULL, LOG_ALL, 1, "Client 'instrcalls' initializing\n");
-	printf("client started\n");
+
+
 	/* also give notification to stderr */
 #ifdef SHOW_RESULTS
 	if (dr_is_notify_on()) {
@@ -102,12 +104,15 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 #endif
 	tls_idx = drmgr_register_tls_field();
 	DR_ASSERT(tls_idx > -1);
+
 }
 
 static void
 event_exit(void)
 {
-	startFake();
+	
+
+//	startFake();
 #ifdef SHOW_SYMBOLS
 	if (drsym_exit() != DRSYM_SUCCESS) {
 		dr_log(NULL, LOG_ALL, 1, "WARNING: error cleaning up symbol library\n");
@@ -239,6 +244,8 @@ static dr_emit_flags_t
 event_app_instruction(void *drcontext, void *tag, instrlist_t *bb, instr_t *instr,
 bool for_trace, bool translating, void *user_data)
 {
+	startServer();
+
 #ifdef VERBOSE
 	if (drmgr_is_first_instr(drcontext, instr)) {
 		dr_printf("in dr_basic_block(tag="PFX")\n", tag);
