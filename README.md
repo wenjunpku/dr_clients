@@ -16,3 +16,10 @@ cd ../build
 
 4. Use Visual Studio Open "ALL BUILD" project
 
+
+===
+RUN
+===
+```
+./get_trace.sh examples/fibonacci/fibonacci_64.exe 00001
+```

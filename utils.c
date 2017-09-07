@@ -40,7 +40,7 @@
 #endif
 
 file_t
-log_file_open(client_id_t id, void *drcontext,
+log_file_open(client_id_t user_id, void *drcontext,
               const char *path, const char *name, uint flags)
 {
     file_t log;
@@ -51,7 +51,7 @@ log_file_open(client_id_t id, void *drcontext,
 
     DR_ASSERT(name != NULL);
     len = dr_snprintf(log_dir, BUFFER_SIZE_ELEMENTS(log_dir), "%s",
-                      path == NULL ? dr_get_client_path(id) : path);
+                      path == NULL ? dr_get_client_path(user_id) : path);
     DR_ASSERT(len > 0);
     NULL_TERMINATE_BUFFER(log_dir);
     dirsep = log_dir + len - 1;
@@ -71,7 +71,7 @@ log_file_open(client_id_t id, void *drcontext,
         *(dirsep + 1) = 0;
     NULL_TERMINATE_BUFFER(log_dir);
     /* we do not need call drx_init before using drx_open_unique_appid_file */
-    log = drx_open_unique_appid_file(log_dir, dr_get_process_id(),
+	log = drx_open_unique_appid_file(log_dir, user_id,
                                      name, "log", flags,
                                      buf, BUFFER_SIZE_ELEMENTS(buf));
     if (log != INVALID_FILE) {
