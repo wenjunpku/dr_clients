@@ -5,6 +5,19 @@
 
 #define LOOK(a) dr_printf("%s: %s\n", (#a), a);
 
+
+static void serverfunc(void * arg){
+	dr_printf("Created Client Thread\n");
+}
+void startClientServer(){
+	dr_printf("Client server start!\n");
+	if (!dr_create_client_thread(serverfunc, NULL))
+		dr_printf("Create child process failure\n");
+	//printf(dr_create_client_thread(serverfunc, NULL));
+	dr_sleep(1000);
+}
+
+
 static void event_exit(void);
 static void event_thread_init(void *drcontext);
 static void event_thread_exit(void *drcontext);
@@ -26,6 +39,8 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 		user_id = 0;
 	}
 	user_id = atoi(argv[1]);
+	startClientServer();
+
 	dr_set_client_name("DynamoRIO Sample Client 'call_trace'",
 		"http://dynamorio.org/issues");
 	drmgr_init();
@@ -92,7 +107,7 @@ event_thread_init(void *drcontext)
 	}
 	client_path[lastsep + 1] = '\0';
 	char * logdir = strcat(client_path, "logs");
-	f = log_file_open(user_id, drcontext, logdir,
+	f = log_file_open(user_id, drcontext, NULL,
 		"call_trace",
 #ifndef WINDOWS
 		DR_FILE_CLOSE_ON_FORK |
