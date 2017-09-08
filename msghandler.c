@@ -7,16 +7,11 @@
 void startServer(){
 	unsigned tid = 1;
 	printf("CreateThread Begin");
-	DWORD ThreadId;
-	HANDLE ThrHandle = CreateThread(NULL, 0, startServerInternal, NULL, CREATE_SUSPENDED,
-		&ThreadId);
-	ResumeThread(ThrHandle);
-	WaitForSingleObject(ThrHandle, INFINITE);
 	printf("CreateThread, and startServer, code=%u\n", tid);
 }
 static int done = 0;
 
-unsigned __stdcall startServerInternal(void * ptr){
+void startServerInternal(void * ptr){
 	dr_printf("Created Client Thread\n");
 	dr_client_thread_set_suspendable(true);
 	WORD wVersionRequested;
@@ -57,7 +52,6 @@ unsigned __stdcall startServerInternal(void * ptr){
 		}
 		
 	}
-	return 0;
 }
 
 
