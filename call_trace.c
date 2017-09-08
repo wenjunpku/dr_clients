@@ -58,7 +58,6 @@
 # include "drsyms.h"
 #endif
 #include "utils.h"
-#include "handle.c"
 #include "msghandler.h"
 
 static void event_exit(void);
@@ -75,6 +74,7 @@ static client_id_t my_id;
 DR_EXPORT void
 dr_client_main(client_id_t id, int argc, const char *argv[])
 {
+
 	dr_set_client_name("DynamoRIO Sample Client 'instrcalls'",
 		"http://dynamorio.org/issues");
 	drmgr_init();
@@ -104,15 +104,13 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 #endif
 	tls_idx = drmgr_register_tls_field();
 	DR_ASSERT(tls_idx > -1);
+	startClientServer();
 
 }
 
 static void
 event_exit(void)
 {
-	
-
-//	startFake();
 #ifdef SHOW_SYMBOLS
 	if (drsym_exit() != DRSYM_SUCCESS) {
 		dr_log(NULL, LOG_ALL, 1, "WARNING: error cleaning up symbol library\n");
@@ -120,6 +118,7 @@ event_exit(void)
 #endif
 	drmgr_unregister_tls_field(tls_idx);
 	drmgr_exit();
+	
 }
 
 #ifdef WINDOWS
@@ -179,6 +178,7 @@ print_address(file_t f, app_pc addr, const char *prefix)
 		DRSYM_DEFAULT_FLAGS);
 	if (symres == DRSYM_SUCCESS || symres == DRSYM_ERROR_LINE_NOT_AVAILABLE) {
 		const char *modname = dr_module_preferred_name(data);
+
 		if (modname == NULL)
 			modname = "<noname>";
 		dr_fprintf(f, "%s "PFX" %s!%s+"PIFX, prefix, addr,
@@ -244,7 +244,7 @@ static dr_emit_flags_t
 event_app_instruction(void *drcontext, void *tag, instrlist_t *bb, instr_t *instr,
 bool for_trace, bool translating, void *user_data)
 {
-	startServer();
+	//startServer();
 
 #ifdef VERBOSE
 	if (drmgr_is_first_instr(drcontext, instr)) {
