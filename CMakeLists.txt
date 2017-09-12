@@ -22,4 +22,11 @@ function (add_sample_client name source_file_list extension_list)
 
 endfunction (add_sample_client)
 
-add_sample_client(call_trace       "call_trace.c;utils.c;handle.c"         "drmgr;drx;drsyms")
+# use add_simple_client to build a new client,
+# the second parameter is all source files you need
+# the third parameter include the extensions you need
+# Then follow the commend in README.md to build your client, open it in vs2013
+
+add_sample_client(call_trace       "call_trace.c;utils.c;handle.c;msghandler.c"         "drmgr;drx;drsyms")
+
+target_link_libraries(call_trace ws2_32.lib)

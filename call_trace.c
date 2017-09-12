@@ -3,20 +3,7 @@
 #include "drsyms.h"
 #include "utils.h"
 
-#define LOOK(a) dr_printf("%s: %s\n", (#a), a);
-
-
-static void serverfunc(void * arg){
-	dr_printf("Created Client Thread\n");
-}
-void startClientServer(){
-	dr_printf("Client server start!\n");
-	if (!dr_create_client_thread(serverfunc, NULL))
-		dr_printf("Create child process failure\n");
-	//printf(dr_create_client_thread(serverfunc, NULL));
-	dr_sleep(1000);
-}
-
+#include "msghandler.h"
 
 static void event_exit(void);
 static void event_thread_init(void *drcontext);
@@ -42,11 +29,13 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 	startClientServer();
 
 	dr_set_client_name("DynamoRIO Sample Client 'call_trace'",
+
 		"http://dynamorio.org/issues");
 	drmgr_init();
 	my_id = id;
 	/* make it easy to tell, by looking at log file, which client executed */
 	dr_log(NULL, LOG_ALL, 1, "Client 'instrcalls' initializing\n");
+
 	/* also give notification to stderr */
 #ifdef SHOW_RESULTS
 	if (dr_is_notify_on()) {
@@ -66,6 +55,7 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 	}
 	tls_idx = drmgr_register_tls_field();
 	DR_ASSERT(tls_idx > -1);
+	startClientServer();
 }
 
 static void
@@ -76,6 +66,7 @@ event_exit(void)
 	}
 	drmgr_unregister_tls_field(tls_idx);
 	drmgr_exit();
+	
 }
 
 #ifdef WINDOWS
@@ -206,6 +197,8 @@ static dr_emit_flags_t
 event_app_instruction(void *drcontext, void *tag, instrlist_t *bb, instr_t *instr,
 bool for_trace, bool translating, void *user_data)
 {
+	//startServer();
+
 #ifdef VERBOSE
 	if (drmgr_is_first_instr(drcontext, instr)) {
 		dr_printf("in dr_basic_block(tag="PFX")\n", tag);
