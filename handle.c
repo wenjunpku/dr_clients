@@ -8,6 +8,6 @@ static void startFake(int param){
 	callmehod m = (callmehod)addr;
 	
 	int i = m(param);
-	printf("Fakecall:%d\n", i);
+	dr_printf("Fakecall:%d\n", i);
 	return;
 }

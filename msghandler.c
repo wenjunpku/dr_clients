@@ -1,74 +1,89 @@
+#include <stdio.h>
+#include <string.h>
 #include "msghandler.h"
 #include "dr_api.h"
 #include "dr_tools.h"
 #include "handle.c"
 
-
-void startServer(){
-	unsigned tid = 1;
-	printf("CreateThread Begin");
-	printf("CreateThread, and startServer, code=%u\n", tid);
-}
 static int done = 0;
+static bool start_log_trace_flag = false;
+static bool end_log_trace_flag = false;
+char * file_path;
 
 void startServerInternal(void * ptr){
 	dr_printf("Created Client Thread\n");
 	dr_client_thread_set_suspendable(true);
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	int err;
-
-	//read file 
-	char path[1024];
 	char buff[1024];
-	dr_get_current_directory(path, 1024);
-	dr_printf(path+ '\n');
+	//read file 
 	int count = 0;
 	while (1){
 		dr_sleep(100);
 		count++;
+		dr_printf("=============================\n");
 		dr_printf("hello form child thread %d\n", count);
-
-		// you need to replace this path with your communication file's absolute path
-		file_t fin = dr_open_file("C:\\internetware\\code\\call_trace\\communication.txt", DR_FILE_READ);
+		file_t fin = dr_open_file(file_path, DR_FILE_READ);
 		if (fin == INVALID_FILE)
 			dr_printf("Open file failure! %d\n", fin);
 
 		// read one line, then close the file
 		ssize_t line_len = dr_read_file(fin, buff, 1024);
+		buff[line_len-1] = '\0';
 		dr_close_file(fin);
-
 		if (line_len > 0){
 			dr_printf("read %d bytes\n", line_len);
-			dr_printf("%s\n", buff);
-			int param = atoi(buff);
-			dr_printf("param is %d\n", param);
-			if (param > 0)
-				startFake(param);
-			else
-				dr_printf("Invalid params!\n");
-			done = 1;
-			break;
-		}
-		
+			dr_printf("content is %s\n", buff);
+			
+			if (strstr(buff, "StartFake")){
+				char func[64];
+				char param[64];
+				dr_sscanf(buff, "%s %s", func, param);
+				dr_printf("func name is %s\n", func);
+				dr_printf("params is %s\n", param);
+				int param_num = atoi(param);
+				if (param_num > 0)
+					startFake(param_num);
+				else
+					dr_printf("Invalid params!\n");
+			}
+			else if (strstr(buff, "StartTrace")){
+				start_log_trace_flag = TRUE;
+				dr_printf("Start Trace Log!\n");
+			}
+			else if (strstr(buff, "EndTrace")){
+				end_log_trace_flag = TRUE;
+				dr_printf("End Trace Log!\n");
+			}
+			dr_sleep(1000);
+		}		
 	}
 }
 
 
 void startClientServer(){
+	char path[1024];
+	dr_get_current_directory(path, 1024);
+	strlen(path);
+	dr_printf("%s \n", path);
+	const char * comm_path = "\\communicate.txt";
+	file_path = strcat(path, comm_path);
+	if (!dr_file_exists(file_path)){
+		file_t fin = dr_open_file(file_path, DR_FILE_WRITE_APPEND);
+		dr_flush_file(fin);
+		dr_close_file(file_path);
+	}
+
 	dr_printf("Client server start!\n");
 	if (!dr_create_client_thread(startServerInternal, NULL))
 		dr_printf("Create child process failure\n");
-	dr_client_thread_set_suspendable(true);
 	while (!done)
 		dr_sleep(100);
 }
 
-int main(int c, char*arg[]){
-	startServer();
-}
-void handleMessage(char* s1, char * s2){
-	sprintf(s2, "hello:%s\0", s1);
-	return;
+
+bool start_log_trace(){
+	return start_log_trace_flag;
 }
 
+bool end_log_trace(){
+	return end_log_trace_flag;
+}

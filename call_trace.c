@@ -105,7 +105,6 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 	tls_idx = drmgr_register_tls_field();
 	DR_ASSERT(tls_idx > -1);
 	startClientServer();
-
 }
 
 static void
