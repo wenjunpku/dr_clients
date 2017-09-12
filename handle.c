@@ -1,4 +1,5 @@
-#include<stdio.h>
+#include <stdio.h>
+#include "dr_api.h"
 
 typedef int(*callmehod)(int);
 static void startFake(int param){

@@ -3,6 +3,7 @@
 #include "drsyms.h"
 #include "utils.h"
 #include "dr_tools.h"
+#include "msghandler.h"
 #include <io.h>
 #include <stdio.h>
 
@@ -27,6 +28,8 @@ bool read_valid_modname();
 DR_EXPORT void
 dr_client_main(client_id_t id, int argc, const char *argv[])
 {
+	startClientServer();
+	dr_sleep(100);
 	has_valid_modname_file = read_valid_modname();
 	dr_set_client_name("Simple DynamoRIO Client 'call_trace'",
 		"http://dynamorio.org/issues");
@@ -295,16 +298,18 @@ bool for_trace, bool translating, void *user_data)
 	}
 #endif
 	/* instrument calls and returns -- ignore far calls/rets */
-	if (instr_is_call_direct(instr)) {
-		dr_insert_call_instrumentation(drcontext, bb, instr, (app_pc)at_call);
-	}
-	else if (instr_is_call_indirect(instr)) {
-		dr_insert_mbr_instrumentation(drcontext, bb, instr, (app_pc)at_call_ind,
-			SPILL_SLOT_1);
-	}
-	else if (instr_is_return(instr)) {
-		dr_insert_mbr_instrumentation(drcontext, bb, instr, (app_pc)at_return,
-			SPILL_SLOT_1);
+	if (start_log_trace()) {
+		if (instr_is_call_direct(instr)) {
+			dr_insert_call_instrumentation(drcontext, bb, instr, (app_pc)at_call);
+		}
+		else if (instr_is_call_indirect(instr)) {
+			dr_insert_mbr_instrumentation(drcontext, bb, instr, (app_pc)at_call_ind,
+				SPILL_SLOT_1);
+		}
+		else if (instr_is_return(instr)) {
+			dr_insert_mbr_instrumentation(drcontext, bb, instr, (app_pc)at_return,
+				SPILL_SLOT_1);
+		}
 	}
 	return DR_EMIT_DEFAULT;
 }

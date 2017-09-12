@@ -1,8 +1,7 @@
 #include <process.h>
 #include <stdio.h>
-#include<windows.h>
+#include <windows.h>
+bool start_log_trace();
 void startServerInternal(void * ptr);
-void startServer();
 void startClientServer();
-void handleMessage(char* s1,char *s2);
 

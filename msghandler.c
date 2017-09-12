@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include <string.h>
-#include "msghandler.h"
+#include <stdlib.h>
 #include "dr_api.h"
 #include "dr_tools.h"
 #include "handle.c"
 
-static int done = 0;
-static bool start_log_trace_flag = false;
-static bool end_log_trace_flag = false;
+static bool log_trace_flag = false;
 char * file_path;
 
 void startServerInternal(void * ptr){
@@ -17,7 +15,6 @@ void startServerInternal(void * ptr){
 	//read file 
 	int count = 0;
 	while (1){
-		dr_sleep(100);
 		count++;
 		dr_printf("=============================\n");
 		dr_printf("hello form child thread %d\n", count);
@@ -46,15 +43,16 @@ void startServerInternal(void * ptr){
 					dr_printf("Invalid params!\n");
 			}
 			else if (strstr(buff, "StartTrace")){
-				start_log_trace_flag = TRUE;
+				log_trace_flag = TRUE;
 				dr_printf("Start Trace Log!\n");
 			}
 			else if (strstr(buff, "EndTrace")){
-				end_log_trace_flag = TRUE;
+				log_trace_flag = FALSE;
 				dr_printf("End Trace Log!\n");
 			}
 			dr_sleep(1000);
-		}		
+		}
+		dr_sleep(100);
 	}
 }
 
@@ -75,15 +73,10 @@ void startClientServer(){
 	dr_printf("Client server start!\n");
 	if (!dr_create_client_thread(startServerInternal, NULL))
 		dr_printf("Create child process failure\n");
-	while (!done)
-		dr_sleep(100);
-}
 
+}
 
 bool start_log_trace(){
-	return start_log_trace_flag;
+	return log_trace_flag;
 }
 
-bool end_log_trace(){
-	return end_log_trace_flag;
-}
